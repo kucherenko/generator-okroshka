@@ -21,21 +21,29 @@ describe('okroshka generator', function () {
 
     it('creates expected files', function (done) {
         var expected = [
-            // add files and folders you expect to exist here.
+            // files
             '.jshintrc',
             '.bowerrc',
             '.editorconfig',
             'Gruntfile.coffee',
-            // folders
-            'src',
-            'test',
-            'lib',
-            'test/unit',
-            'assets',
-            'assets/templates',
-            'assets/stylesheets',
-            'assets/images',
+            'app/index.html',
+            'app/404.html',
 
+            // folders
+            'app',
+            'app/scripts',
+            'app/scripts/models',
+            'app/scripts/collections',
+            'app/scripts/helpers',
+            'app/scripts/routes',
+            'app/scripts/views',
+
+            'app/assets',
+            'app/assets/templates',
+            'app/assets/stylesheets',
+            'app/assets/images',
+            'test',
+            'test/unit',
         ];
 
         helpers.mockPrompt(this.app, {});

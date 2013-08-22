@@ -66,13 +66,11 @@ module.exports = (grunt) ->
 
     watch:
       files: [
-        'Gruntfile.coffee'
-        'src/**/*.coffee'
-        'src/**/*.js'
-        'test/**/*.coffee'
-        'assets/stylesheets/**/*.less'
-        'assets/templates/**/*.handlebars'
-        'assets/templates/**/*.hbs'
+        'Gruntfile.{coffee|js}'
+        'app/source/**/*.{coffee|js}'
+        'test/unit/**/*.coffee'
+        'app/source/assets/stylesheets/**/*.less'<% if (isHandlebars) { %>
+        'app/source/assets/templates/**/*.{handlebars|hbs}'<% } %>
       ]
       tasks: 'default'
 

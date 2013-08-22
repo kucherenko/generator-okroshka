@@ -22,7 +22,9 @@
     },
     "dependencies": {
         "yeoman-generator": "~0.13.0",
-        "handlebars": "1.0.x"
+        "wrench": "1.5.x",
+        "underscore": "1.5.x",
+        "underscore.string": "2.3.x"
     },
     "devDependencies": {
         "grunt": "*",
