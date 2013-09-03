@@ -60,10 +60,9 @@ OkroshkaGenerator.prototype.askFor = function askFor() {
 
 OkroshkaGenerator.prototype.app = function app() {
     wrench.copyDirSyncRecursive(this.sourceRoot() + '/app/', 'app');
-    this.mkdir('test');
-    this.mkdir('test/unit');
+    wrench.copyDirSyncRecursive(this.sourceRoot() + '/test/', 'test');
 
-    this.template('Gruntfile.coffee');
+    this.copy('Gruntfile.coffee');
     this.template('package.json');
     this.template('bower.json');
     this.template('app/scripts/templates/application.hbs');

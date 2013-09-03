@@ -22,7 +22,7 @@ require.config
 
 define [
   'backbone'
-  'routers/application'
+  'routes/application'
 ], (Backbone, Application) ->
   new Application()
   Backbone.history.start()
