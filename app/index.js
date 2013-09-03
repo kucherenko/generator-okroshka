@@ -26,28 +26,34 @@ OkroshkaGenerator.prototype.askFor = function askFor() {
     var prompts = [
         {
             type: 'confirm',
-            name: 'isAMD',
-            message: 'Would you like to use AMD?',
-            default: true
-        },
-        {
-            type: 'confirm',
             name: 'isHandlebars',
             message: 'Would you like to use handlebars template engine?',
             default: true
         },
         {
             type: 'confirm',
-            name: 'isI18n',
-            message: 'Would you like to use i18n?',
+            name: 'isCucumber',
+            message: 'Would you like to use cucumber.js for develop with BDD?',
+            default: true
+        },
+        {
+            type: 'confirm',
+            name: 'isBootstrap',
+            message: 'Would you like to use Twitter Bootstrap?',
             default: true
         }
+//        {
+//            type: 'confirm',
+//            name: 'isI18n',
+//            message: 'Would you like to use i18n?',
+//            default: true
+//        }
     ];
 
     this.prompt(prompts, function (props) {
-        this.isAMD = props.isAMD;
         this.isHandlebars = props.isHandlebars;
-        this.isI18n = props.isI18n;
+        this.isBootstrap = props.isBootstrap;
+        this.isCucumber = props.isCucumber;
         cb();
     }.bind(this));
 };
@@ -60,6 +66,8 @@ OkroshkaGenerator.prototype.app = function app() {
     this.template('Gruntfile.coffee');
     this.template('package.json');
     this.template('bower.json');
+    this.template('app/scripts/templates/application.hbs');
+    this.template('app/styles/main.less');
 
     this.copy('_bowerrc', '.bowerrc');
     this.copy('index.html', 'app/index.html');

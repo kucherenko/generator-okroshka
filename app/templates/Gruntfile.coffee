@@ -1,14 +1,13 @@
+"use strict"
 LIVERELOAD_PORT = 35729
-lrSnippet = require('connect-livereload') port: LIVERELOAD_PORT
-
+lrSnippet = require("connect-livereload")(port: LIVERELOAD_PORT)
 mountFolder = (connect, dir) ->
-    connect.static require('path').resolve dir
+  connect.static require("path").resolve(dir)
 
 module.exports = (grunt) ->
 
-#  // show elapsed time at the end
+  connect = require 'connect'
   require('time-grunt') grunt
-#    // load all grunt tasks
   require('load-grunt-tasks') grunt
 
   yeomanConfig =
@@ -20,13 +19,27 @@ module.exports = (grunt) ->
     pkg: '<\json:package.json>'
 
     clean:
-      dist: ['.tmp', '<%%= yeoman.dist %>/*']
+      dist: ['.tmp', '<%= yeoman.dist %>/*']
       server: '.tmp'
 
     coffee:
-      lib:
-        files:
-          'lib/*.js': 'src/**/*.coffee'
+      dist:
+        files: [
+          expand: true
+          cwd: "<%= yeoman.app %>/scripts"
+          src: "{,*/}*.coffee"
+          dest: ".tmp/scripts"
+          ext: ".js"
+        ]
+
+      test:
+        files: [
+          expand: true
+          cwd: "test/unit"
+          src: "{,*/}*.coffee"
+          dest: ".tmp/unit"
+          ext: ".js"
+        ]
 
     simplemocha:
       lib:
@@ -41,79 +54,71 @@ module.exports = (grunt) ->
     requirejs:
       dist:
         options:
-          baseUrl: '<%%= yeoman.app %>/scripts',
-          optimize: 'none',
+          baseUrl: "<%= yeoman.app %>/scripts"
+          optimize: "none"
           paths:
-              templates: '../../.tmp/assets/templates'
-          preserveLicenseComments: false,
+            templates: "../../.tmp/scripts/templates"
+          preserveLicenseComments: false
           useStrict: true
-
+          wrap: true
     bower:
       all:
         rjsConfig: '<%%= yeoman.app %>/scripts/main.js'
 
-    coffeelint:
-      app: [
-        'Gruntfile.coffee'
-        'src/**/**/*.coffee'
-        'test/**/**/*.coffee'
-      ]
-
+    connect:
       options:
-        no_tabs:
-          level: 'error'
+        port: 9001
 
-        no_trailing_whitespace:
-          level: 'error'
+        # change this to '0.0.0.0' to access the server from outside
+        hostname: "localhost"
 
-        max_line_length:
-          value: 79
-          level: 'error'
+      livereload:
+        options:
+          middleware: (connect) ->
+            [
+              lrSnippet,
+              mountFolder connect, ".tmp"
+              mountFolder connect, yeomanConfig.app
+            ]
 
-        camel_case_classes:
-          level: 'error'
+      test:
+        options:
+          middleware: (connect) ->
+            [
+              mountFolder connect, ".tmp"
+              mountFolder connect, "test"
+              mountFolder connect, yeomanConfig.app
+            ]
 
-        indentation:
-          value: 2
-          level: 'error'
-
-        no_implicit_braces:
-          level: 'ignore'
-
-        no_trailing_semicolons:
-          level: 'error'
-
-        no_plusplus:
-          level: 'ignore'
-
-        no_throwing_strings:
-          level: 'error'
-
-        cyclomatic_complexity:
-          value: 11
-          level: 'ignore'
-
-        line_endings:
-          value: 'unix'
-          level: 'ignore'
-
-        no_implicit_parens:
-          level: 'ignore'
+      dist:
+        options:
+          middleware: (connect) -> [mountFolder connect, yeomanConfig.dist]
 
     watch:
-      files: [
-        'Gruntfile.{coffee|js}'
-        'app/source/**/*.{coffee|js}'
-        'test/unit/**/*.coffee'
-        'app/source/assets/stylesheets/**/*.less'<% if (isHandlebars) { %>
-        'app/source/assets/templates/**/*.{handlebars|hbs}'<% } %>
-      ]
-      tasks: 'default'
+      options:
+        nospawn: true
 
-  grunt.loadNpmTasks 'grunt-simple-mocha'
-  grunt.loadNpmTasks 'grunt-contrib-less'
-  grunt.loadNpmTasks 'grunt-contrib-coffee'
-  grunt.loadNpmTasks 'grunt-contrib-watch'
+      coffee:
+        files: ["<%= yeoman.app %>/scripts/{,*/}*.coffee"]
+        tasks: ["coffee:dist"]
+
+      coffeeTest:
+        files: ["test/unit/{,*/}*.coffee"]
+        tasks: ["coffee:test"]
+
+      livereload:
+        options:
+          livereload: LIVERELOAD_PORT
+
+        files: [
+          "<%= yeoman.app %>/*.html"
+          "{.tmp,<%= yeoman.app %>}/assets/stylesheets/{,*/}*.css"
+          "{.tmp,<%= yeoman.app %>}/scripts/{,*/}*.js"
+          "<%= yeoman.app %>/assets/images/{,*/}*.{png,jpg,jpeg,gif,webp}"
+        ]
 
   grunt.registerTask 'test', 'simplemocha'
-  grunt.registerTask 'default', ['coffee', 'simplemocha']
+  grunt.registerTask 'default', [
+    'coffee'
+    'simplemocha'
+  ]

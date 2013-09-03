@@ -21,18 +21,18 @@
         "test": "mocha"
     },
     "dependencies": {
-        "yeoman-generator": "~0.13.0",
+        "yeoman-generator": "~0.13.x",
         "wrench": "1.5.x",
         "underscore": "1.5.x",
         "underscore.string": "2.3.x"
     },
     "devDependencies": {
-        "grunt": "*",
+        "grunt": "~0.4.x",
         "grunt-contrib-watch": "*",
-        "grunt-contrib-coffee": "*",
+        "grunt-contrib-coffee": "~0.4.x",
         "grunt-simple-mocha": "*",
-        "mocha": "*",
-        "chai": "*"
+        "mocha": "~1.12.x",
+        "chai": "~1.7.x"
     },
     "peerDependencies": {
         "yo": ">=1.0.0-rc.1"
