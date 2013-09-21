@@ -1,7 +1,7 @@
 {
     "name": "generator-okroshka",
     "version": "0.0.1",
-    "description": "A generator for Yeoman",
+    "description": "generator-okroshka is an easy way to start project with AMD, TDD and BDD.",
     "keywords": [
         "yeoman-generator"
     ],

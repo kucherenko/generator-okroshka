@@ -17,7 +17,7 @@ Generator okroshka include:
  - CoffeeScript - I don't like phrase "syntax sugar", CoffeeScript is syntax meat for JS, okroshka needs meat;
  - [Cucumber.js](https://github.com/cucumber/cucumber-js) - the popular Behaviour-Driven Development tool;
  - Mocha & chai & sinon - popular frameworks for TDD and unit testing;
- - RequireJS - realisation of AMD;
+ - RequireJS - implementation of AMD;
  - Twitter Bootstrap - sleek, intuitive, and powerful mobile first front-end framework for faster and easier web development;
  - backbone & underscore & handlebars - flexible framework for frontend development;
  - jquery - just jquery;
