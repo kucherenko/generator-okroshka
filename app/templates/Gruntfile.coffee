@@ -1,4 +1,5 @@
-lrSnippet = require("grunt-contrib-livereload/lib/utils").livereloadSnippet
+LIVERELOAD_PORT = 1337
+lrSnippet = require("connect-livereload")(port: LIVERELOAD_PORT)
 
 mountFolder = (connect, dir) ->
   connect.static require("path").resolve(dir)
@@ -6,75 +7,87 @@ mountFolder = (connect, dir) ->
 
 module.exports = (grunt) ->
 
-  # load all grunt tasks
-  require("matchdep").filterDev("grunt-*").forEach grunt.loadNpmTasks
+  require('time-grunt')(grunt)
+  require('load-grunt-tasks')(grunt)
 
   yeomanConfig =
     app: 'app/'
     tmp: '.tmp/'
     dist: 'dist/'
+    test: 'test/'
+    specs: 'test/specs/'
+    features: 'test/features/'
 
   grunt.initConfig
     yeoman: yeomanConfig
-    pkg: '<json:package.json>'
+    pkg: '<\json:package.json>'
 
-    esteWatch:
+    watch:
       options:
-        dirs: [
-          '<%= yeoman.app %>scripts/**/'
-          '<%= yeoman.app %>styles/**/'
-          '<%= yeoman.app %>images/**/'
-          'test/specs/**/'
-          'test/features/**/'
-          '<%= yeoman.tmp %>scripts/**/'
-          '<%= yeoman.tmp %>styles/**/'
+        nospawn: true
+
+      coffee:
+        files: ["<%= yeoman.app %>scripts/{,*/}*.coffee"]
+        tasks: ["coffeeCoverage"]
+
+      coffeeTest:
+        files: ["<%= yeoman.specs %>**/*.coffee"]
+        tasks: ["coffee:test", "scriptlinker"]
+
+      livereload:
+        options:
+          livereload: LIVERELOAD_PORT
+
+        files: [
+          "<%= yeoman.app %>/*.html"
+          "{<%= yeoman.tmp %>,<%= yeoman.app %>}styles/{,*/}*.css"
+          "{<%= yeoman.tmp %>,<%= yeoman.app %>}scripts/{,*/}*.js"
+          "<%= yeoman.app %>images/**/*.{png,jpg,jpeg,gif,webp}"
         ]
 
-      coffee: (filepath) ->
-        isTest = filepath.indexOf('test') isnt -1
-        cwd = if isTest then 'test/' else '<%= yeoman.app %>scripts/'
-        files = [
-          expand: true
-          cwd: cwd
-          src: filepath.replace cwd, ''
-          ext: '.js'
-          dest: if isTest then '<%= yeoman.tmp %>test/' else '<%= yeoman.tmp %>scripts/'
-        ]
-        grunt.config ['coffee', 'dist', 'files'], files
-        [
-          'coffee:dist'
-          'scriptlinker'
-          "cucumberjs:wip"
-          'mocha'
-        ]
+      jst:
+        files: ["<%= yeoman.app %>scripts/templates/**/*.ejs"]
+        tasks: ["jst"]
 
-      feature: (filepath) ->
-        grunt.config ['cucumberjs', 'wip', 'files'], [
-          src: filepath
+      handlebars:
+        files: ["<%= yeoman.app %>scripts/templates/**/*.hbs"]
+        tasks: ["handlebars"]
+
+      less:
+        files: ["<%= yeoman.app %>styles/**/*.less"]
+        tasks: ["recess:dev"]
+
+      features:
+        files: [
+          "<%= yeoman.features %>**/*.features"
+          "<%= yeoman.features %>**/*.coffee"
         ]
-        ['cucumberjs:wip']
-      hbs: ->
-        ['handlebars']
-      ejs: ->
-        ['jst']
-      less: ->
-        ['recess:dev']
+        tasks: ["cucumberjs:wip"]
+
+      test:
+        files: [
+          '<%= yeoman.app %>scripts/**/*.coffee'
+          '<%= yeoman.specs %>**/*.coffee'
+        ]
+        tasks: ["mocha_browser", 'mocha_phantomjs']
 
     coffee:
       dist:
         files: [
           expand: true
           cwd: "<%= yeoman.app %>scripts"
-          src: "{,*/}*.coffee"
+          src: "**/*.coffee"
           dest: "<%= yeoman.tmp %>scripts"
           ext: ".js"
         ]
 
       test:
+        options:
+          bare: on
         files: [
           expand: true
           cwd: "test"
-          src: "{,*/}*.coffee"
+          src: "**/*.coffee"
           dest: "<%= yeoman.tmp %>test"
           ext: ".js"
         ]
@@ -82,6 +95,9 @@ module.exports = (grunt) ->
     scriptlinker:
       test:
         options:
+          startTag: '/* TESTS */',
+          endTag: '/* END TESTS */',
+          fileTmpl: "tests.push('%s');",
           appRoot: '<%= yeoman.tmp %>test/'
         files:
           "<%= yeoman.tmp %>test/index.html": ["<%= yeoman.tmp %>test/specs/**/*.js"]
@@ -98,35 +114,41 @@ module.exports = (grunt) ->
           middleware: (connect) ->
             [
               lrSnippet
-              mountFolder(connect, ".tmp")
-              mountFolder(connect, "app")
+              mountFolder(connect, yeomanConfig.tmp)
+              mountFolder(connect, yeomanConfig.app)
             ]
 
       test:
         options:
           middleware: (connect) ->
             [
-              mountFolder(connect, ".tmp")
-              mountFolder(connect, "app")
+              mountFolder(connect, yeomanConfig.tmp)
+              mountFolder(connect, yeomanConfig.app)
             ]
 
       dist:
         options:
           middleware: (connect) ->
-            [mountFolder(connect, "dist")]
+            [mountFolder(connect, yeomanConfig.dist)]
 
     open:
       server:
         path: "http://localhost:<%= connect.options.port %>"
 
     clean:
-      dist: [".tmp", "<%= yeoman.dist %>*"]
-      server: ".tmp"
+      dist: ["<%= yeoman.tmp %>", "<%= yeoman.dist %>*"]
+      server: "<%= yeoman.tmp %>"
 
     mocha:
       all:
         options:
           run: true
+          urls: ["http://localhost:<%= connect.options.port %>/test/"]
+
+    mocha_phantomjs:
+      all:
+        options:
+          reporter: 'dot'
           urls: ["http://localhost:<%= connect.options.port %>/test/"]
 
     recess:
@@ -153,20 +175,20 @@ module.exports = (grunt) ->
     useminPrepare:
       html: "<%= yeoman.app %>index.html"
       options:
-        dest: "dist"
+        dest: yeomanConfig.dist
 
     usemin:
-      html: ["<%= yeoman.dist %>{,*/}*.html"]
-      css: ["<%= yeoman.dist %>styles/{,*/}*.css"]
+      html: ["<%= yeoman.dist %>**/*.html"]
+      css: ["<%= yeoman.dist %>styles/**/*.css"]
       options:
-        dirs: ["dist"]
+        dirs: [yeomanConfig.dist]
 
     imagemin:
       dist:
         files: [
           expand: true
           cwd: "<%= yeoman.app %>images"
-          src: "{,*/}*.{png,jpg,jpeg}"
+          src: "**/*.{png,jpg,jpeg}"
           dest: "<%= yeoman.dist %>images"
         ]
 
@@ -182,16 +204,16 @@ module.exports = (grunt) ->
 
         files: [
           expand: true
-          cwd: "app"
+          cwd: yeomanConfig.app
           src: "*.html"
-          dest: "dist"
+          dest: yeomanConfig.dist
         ]
 
     handlebars:
       options:
         amd: true
         processName: (filename) ->
-          filename.replace('<%= yeoman.app %>scripts/templates/', '').replace '.hbs', ''
+          filename.replace("#{yeomanConfig.app}scripts/templates/", '').replace '.hbs', ''
       compile:
         files:
           '<%= yeoman.tmp %>scripts/templates.js': ['<%= yeoman.app %>scripts/templates/*.hbs']
@@ -200,7 +222,7 @@ module.exports = (grunt) ->
       options:
         amd: true
         processName: (filename) ->
-          filename.replace('<%= yeoman.app %>scripts/templates/', '').replace '.ejs', ''
+          filename.replace("#{yeomanConfig.app}scripts/templates/", '').replace '.ejs', ''
       compile:
         files:
           '<%= yeoman.tmp %>scripts/templates.js': ['<%= yeoman.app %>scripts/templates/*.hbs']
@@ -210,16 +232,16 @@ module.exports = (grunt) ->
         files: [
           expand: true
           dot: true
-          cwd: "app"
-          dest: "dist"
-          src: ["*.{ico,txt}", ".htaccess", "images/{,*/}*.{webp,gif}", "styles/fonts/*"]
+          cwd: yeomanConfig.app
+          dest: yeomanConfig.dist
+          src: ["*.{ico,txt}", ".htaccess", "images/**/*.{webp,gif}", "styles/fonts/*"]
         ]
 
       tests:
         files: [
           expand: true
           dot: true
-          cwd: "test/"
+          cwd: "<%= yeoman.test %>"
           dest: "<%= yeoman.tmp %>test"
           src: ['index.html']
         ]
@@ -231,13 +253,13 @@ module.exports = (grunt) ->
           cwd: "app"
           dest: ".tmp"
           src: [
-            "components/requirejs/require.js",
-            "components/jquery/jquery.js",
-            "components/underscore/underscore.js",
-            "components/backbone/backbone.js",
-            "components/handlebars/handlebars.js",
-            "components/bootstrap/dist/js/bootstrap.js",
-            "scripts/{,*/}*.js"
+            "components/requirejs/require.js"
+            "components/jquery/jquery.js"
+            "components/underscore/underscore.js"
+            "components/backbone/backbone.js"
+            "components/handlebars/handlebars.js"
+            "components/bootstrap/dist/js/bootstrap.js"
+            "scripts/**/*.js"
           ]
         ]
 
@@ -245,33 +267,45 @@ module.exports = (grunt) ->
       dist:
         files:
           src: [
-            "<%= yeoman.dist %>scripts/{,*/}*.js",
-            "<%= yeoman.dist %>styles/{,*/}*.css",
-            "<%= yeoman.dist %>images/{,*/}*.{png,jpg,jpeg,gif,webp}",
+            "<%= yeoman.dist %>scripts/**/*.js",
+            "<%= yeoman.dist %>styles/**/*.css",
+            "<%= yeoman.dist %>images/**/*.{png,jpg,jpeg,gif,webp}",
             "<%= yeoman.dist %>styles/fonts/*"
           ]
+
+    mocha_browser:
+      all:
+        options:
+          output: "<%= yeoman.tmp %>test/coverage.html"
+          reporter: 'html-cov'
+          urls: ["http://localhost:<%= connect.options.port %>/test/"]
+
+    coffeeCoverage:
+      options:
+        path: "<%= yeoman.app %>/scripts"
+      '.tmp/scripts': "<%= yeoman.app %>/scripts"
 
     cucumberjs:
       wip:
         files: [
-          src: 'test/features'
+          src: '<%= yeoman.features %>'
         ]
         options:
-          steps: "test/features/step_definitions"
+          steps: "<%= yeoman.features %>step_definitions"
           tags: "@wip"
       done:
         files: [
-          src: 'test/features'
+          src: '<%= yeoman.features %>'
         ]
         options:
-          steps: "test/features/step_definitions"
+          steps: "<%= yeoman.features %>step_definitions"
           tags: "@done"
       all:
         files: [
-          src: 'test/features'
+          src: '<%= yeoman.features %>'
         ]
         options:
-          steps: "test/features/step_definitions"
+          steps: "<%= yeoman.features %>step_definitions"
 
 
   grunt.registerTask "server", (target) ->
@@ -285,29 +319,44 @@ module.exports = (grunt) ->
       grunt.task.run [
         "clean:server"
         "coffee"
-        "handlebars"
+        "coffeeCoverage"
+        "handlebars" # use "jst" if you don't use handlebars templates
         "copy:tests"
         "scriptlinker"
         "recess:dev"
         "connect:livereload"
+        "mocha_browser"
         "open"
-        "esteWatch"
+        "watch"
       ]
 
   grunt.registerTask "test", [
     "clean:server"
-    "coffee"
+    "coffeeCoverage"
+    "coffee:test"
     "copy:tests"
     "scriptlinker"
-    "handlebars"
+    "handlebars" # use "jst" if you don't use handlebars templates
     "connect:test"
-    "mocha"
+    "mocha_phantomjs"
+    "mocha_browser"
+  ]
+
+  grunt.registerTask "e2e", [
+    "clean:server"
+    "coffeeCoverage"
+    "coffee:test"
+    "copy:tests"
+    "scriptlinker"
+    "handlebars" # use "jst" if you don't use handlebars templates
+    "connect:test"
+    "cucumberjs:done"
   ]
 
   grunt.registerTask "build", [
     "clean:dist"
-    "coffee"
-    "handlebars"
+    "coffee:dist"
+    "handlebars" # use "jst" if you don't use handlebars templates
     "recess:dist"
     "useminPrepare"
     "copy:prepareRequirejs"

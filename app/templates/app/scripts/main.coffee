@@ -14,15 +14,22 @@ require.config
 
     handlebars:
       exports: "Handlebars"
+      init: ->
+        @Handlebars = Handlebars
+        @Handlebars
 
     bootstrap:
       deps: ['jquery']
       exports: 'jquery'
 
+require [
+  "jquery"
+  "backbone"
+  "routes/application"
+  "handlebars"
+], ($, Backbone, ApplicationRouter) ->
 
-define [
-  'backbone'
-  'routes/application'
-], (Backbone, Application) ->
-  new Application()
-  Backbone.history.start()
+  $ ->
+    console.log "Enjoy okroshka!"
+    new ApplicationRouter()
+    Backbone.history.start()

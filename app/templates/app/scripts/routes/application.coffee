@@ -1,14 +1,13 @@
-define [
-  'backbone'
-  'views/application'
-], (Backbone, Application) ->
+define (require) ->
+
+  Backbone = require 'backbone'
+  ApplicationView = require 'views/application'
+
   class ApplicationRouter extends Backbone.Router
+
     routes:
-      'about': 'showAbout'
-      '': 'defaultRoute'
-    showAbout: ->
-      @view = new Application()
-      $('#main').html @view.render()
+      '*path': 'defaultRoute'
 
     defaultRoute: ->
-      @.showAbout()
+      @view = new ApplicationView()
+      $('#main').html @view.render()

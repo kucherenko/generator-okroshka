@@ -23,6 +23,7 @@ describe('okroshka generator', function () {
         var expected = [
             // files
             '.jshintrc',
+            '.gitignore',
             '.bowerrc',
             '.editorconfig',
             'Gruntfile.coffee',
@@ -37,13 +38,14 @@ describe('okroshka generator', function () {
             'app/scripts/helpers',
             'app/scripts/routes',
             'app/scripts/views',
-
-            'app/assets',
-            'app/assets/templates',
-            'app/assets/stylesheets',
-            'app/assets/images',
+            'app/scripts/templates',
+            'app/styles',
+            'app/images',
             'test',
-            'test/unit',
+            'test/specs',
+            'test/features',
+            'test/features/step_definitions',
+            'test/features/support'
         ];
 
         helpers.mockPrompt(this.app, {});
@@ -54,8 +56,4 @@ describe('okroshka generator', function () {
             done();
         });
     });
-
-    it('creates folders', function () {
-
-    })
 });

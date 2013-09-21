@@ -1,25 +1,33 @@
 <html>
-  <head>
+<head>
     <meta charset="utf-8"/>
-    <title>Backbone Tests</title>
+    <title>Okroshka Tests</title>
     <link rel="stylesheet" href="../components/mocha/mocha.css"/>
-  </head>
-  <body>
-    <div id="mocha"></div>
+</head>
+<body>
 
-    <script src="../components/requirejs/require.js"></script>
-    <script src="../components/jquery/jquery.js"></script>
-    <script src="../components/mocha/mocha.js"></script>
-    <script src="../components/chai/chai.js"></script>
-    <script src="bootstrap.js" type="text/javascript"></script>
-    <script type="text/javascript">
-        mocha.setup("bdd");
-        mocha.bail(false);
-    </script>
-    <!--SCRIPTS-->
-    <!--SCRIPTS END-->
-    <script>
-        mocha.run();
-    </script>
-  </body>
+<div id="mocha">
+    <div style="position: fixed; top: 5px; left: 5px">
+        <a href="coverage.html"><button>Cove-<br>rage</button></a>
+    </div>
+</div>
+
+<script src="../components/mocha/mocha.js"></script>
+
+<script src="../components/chai/chai.js"></script>
+<script src="../components/sinon-chai/lib/sinon-chai.js"></script>
+<script src="../components/sinonjs/sinon.js"></script>
+<script src="../components/chai-backbone/chai-backbone.js"></script>
+
+<script src="../components/requirejs/require.js" type="text/javascript"></script>
+<script src="bootstrap.js"></script>
+
+<script type="text/javascript" charset="utf-8">
+    var tests = [];
+    /* TESTS */
+    /* END TESTS */
+    require(tests, runMocha);
+</script>
+
+</body>
 </html>
