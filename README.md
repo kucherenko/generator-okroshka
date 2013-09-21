@@ -1,13 +1,10 @@
 # generator-okroshka [![Build Status](https://secure.travis-ci.org/kucherenko/generator-okroshka.png?branch=master)](https://travis-ci.org/kucherenko/generator-okroshka)
 
-A generator for [Yeoman](http://yeoman.io).
-
-
 ## Getting Started
 
 ### What is generator okroshka?
 
-Generator okroshka is a generator for Yeoman.
+Generator okroshka is a generator for [Yeoman](http://yeoman.io).
 
 ### What is okroshka?
 
@@ -28,6 +25,48 @@ Generator okroshka include:
 All of this pieces make generator okroshka delicious thing for Yeoman.
 Structure of project created with okroshka include examples of application on Backbone with AMD made on CoffeeScript, include example of environment for unit testing with mocha, chai & sinon with codecoverage, include example of BDD features with cucumber.js, include grunt file for developmnet and production builds.
 
+To install generator-okroshka from npm, run:
+
+```
+$ npm install -g generator-okroshka
+```
+
+Finally, initiate the generator:
+
+```
+$ yo okroshka
+```
+
+### Usage
+
+Run mocha tests:
+```
+$ grunt test
+```
+
+Run cucumber.js:
+```
+$ grunt e2e
+```
+
+Start development server:
+```
+$ grunt server
+```
+Development server watching for changes in your folders, reload you project after changes, run tests and generate code coverage.
+
+Also you can run tests in browser if you dev server is working, tests located at [http://localhost:9000/test/](http://localhost:9000/test/). Code coverage report located at [http://localhost:9000/test/coverage.html](http://localhost:9000/test/coverage.html)
+
+Build you project for production:
+```
+$ grunt build
+```
+
+Start server for productiuon code:
+```
+$ grunt server:dist
+```
+
 ### What is Yeoman?
 
 Trick question. It's not a thing. It's this guy:
@@ -45,18 +84,6 @@ $ npm install -g yo
 ### Yeoman Generators
 
 Yeoman travels light. He didn't pack any generators when he moved in. You can think of a generator like a plug-in. You get to choose what type of application you wish to create, such as a Backbone application or even a Chrome extension.
-
-To install generator-okroshka from npm, run:
-
-```
-$ npm install -g generator-okroshka
-```
-
-Finally, initiate the generator:
-
-```
-$ yo okroshka
-```
 
 ### Getting To Know Yeoman
 
